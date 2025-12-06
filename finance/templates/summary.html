@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+    .chart-card {
+        padding: 20px;
+        border-radius: 12px;
+        background: #ffffff;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    }
+    canvas {
+        height: 280px !important; /* fixed height = all charts visible */
+    }
+</style>
+
+<div class="container mt-4">
+
+    <h2 class="text-center mb-4 fw-bold">Financial Summary Dashboard</h2>
+
+    <!-- Top Summary Cards -->
+    <div class="row g-4 mb-4 text-center">
+        <div class="col-md-4">
+            <div class="chart-card">
+                <h5>Total Income</h5>
+                <p class="text-success fw-bold fs-4">₹ {{ total_income }}</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="chart-card">
+                <h5>Total Expense</h5>
+                <p class="text-danger fw-bold fs-4">₹ {{ total_expense }}</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="chart-card">
+                <h5>Net Savings</h5>
+                <p class="fw-bold fs-4 
+                    {% if savings >= 0 %} text-primary 
+                    {% else %} text-danger 
+                    {% endif %}">
+                    ₹ {{ savings }}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- CHART GRID -->
+    <div class="row g-4">
+
+        <!-- Pie Chart -->
+        <div class="col-md-4">
+            <div class="chart-card">
+                <h6 class="text-center">Income vs Expense</h6>
+                <canvas id="pieChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Monthly Bar Chart -->
+        <div class="col-md-4">
+            <div class="chart-card">
+                <h6 class="text-center">Monthly Report</h6>
+                <canvas id="barChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Savings Line Chart -->
+        <div class="col-md-4">
+            <div class="chart-card">
+                <h6 class="text-center">Savings Trend</h6>
+                <canvas id="lineChart"></canvas>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    // Pie Chart
+    new Chart(document.getElementById('pieChart'), {
+        type: 'pie',
+        data: {
+            labels: ['Income', 'Expense'],
+            datasets: [{
+                data: [{{ total_income }}, {{ total_expense }}],
+                backgroundColor: ['#5ea908ff', '#c45e04ff']
+            }]
+        }
+    });
+
+    // Monthly Bar Chart
+    const months = {{ months | tojson }};
+    const incomeList = {{ income_list | tojson }};
+    const expenseList = {{ expense_list | tojson }};
+
+    new Chart(document.getElementById('barChart'), {
+        type: 'bar',
+        data: {
+            labels: months,
+            datasets: [
+                {
+                    label: 'Income',
+                    data: incomeList,
+                    backgroundColor: '#1b7003ff'
+                },
+                {
+                    label: 'Expense',
+                    data: expenseList,
+                    backgroundColor: '#fd0303ff'
+                }
+            ]
+        },
+        options: { maintainAspectRatio: false }
+    });
+
+    // Savings Line Chart
+    const savingsList = {{ savings_list | tojson }};
+
+    new Chart(document.getElementById('lineChart'), {
+        type: 'line',
+        data: {
+            labels: months,
+            datasets: [{
+                label: "Savings",
+                data: savingsList,
+                borderWidth: 2,
+                tension: 0.4
+            }]
+        },
+        options: { maintainAspectRatio: false }
+    });
+</script>
+
+{% endblock %}

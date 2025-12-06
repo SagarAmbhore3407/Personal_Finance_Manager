@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container mt-4">
+    <style>
+        .neon-bg {
+            background-color: #0f0f0f; /* dark background for neon effect */
+            color: #06ffdeff; /* neon green text */
+            text-shadow: 0 0 5px #000000ff,
+                 0 0 10px #056d5cff,
+                 0 0 20px #035144ff,
+                 0 0 40px #055b4dff;
+                }
+
+        .neon-bg h2, .neon-bg p {
+         color: #09f1b3ff;
+        }
+    </style>
+
+    <!-- Hero / Slogan -->
+    <div class="p-4 mb-4 rounded shadow-sm neon-bg">
+        <h2 class="mb-1">Manage. Track. Grow.</h2>
+        <p class="mb-0">Your personal finance — simple, fast, and organized.</p>
+    </div>
+
+
+    <!-- Summary Cards -->
+    <div class="row text-center mb-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm p-3">
+                <h5>Total Income</h5>
+                <p class="text-success fw-bold fs-5">₹ {{ income }}</p>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm p-3">
+                <h5>Total Expense</h5>
+                <p class="text-danger fw-bold fs-5">₹ {{ expense }}</p>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm p-3">
+                <h5>Current Balance</h5>
+                <p class="fw-bold fs-5 text-primary">₹ {{ balance }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Action Buttons -->
+    <div class="d-flex justify-content-center gap-3 mb-4">
+        <a href="{{ url_for('main.add_transaction') }}" class="btn btn-success px-4">+ Add Transaction</a>
+        <a href="{{ url_for('main.summary') }}" class="btn btn-primary px-4">📊 View Summary</a>
+        <a href="{{ url_for('main.search') }}" class="btn btn-dark px-4">🔍 Search</a>
+    </div>
+
+    <!-- Mini Chart -->
+    <div class="card p-3 shadow-sm mb-4">
+        <h5 class="text-center mb-3">Income vs Expense</h5>
+        <canvas id="miniChart" height="160"></canvas>
+    </div>
+
+    <!-- Recent Transactions -->
+    <h5 class="mt-3 mb-2">Recent Transactions</h5>
+    <div class="table-responsive bg-white p-3 rounded shadow-sm">
+        <table class="table table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in transactions %}
+                <tr>
+                    <td>{{ t.date.strftime('%Y-%m-%d') }}</td>
+                    <td>
+                        {% if t.trans_type == 'income' %}
+                        <span class="text-success fw-bold">Income</span>
+                        {% else %}
+                        <span class="text-danger fw-bold">Expense</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ t.description }}</td>
+                    <td>₹ {{ t.amount }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<!-- ChartJS -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const ctx = document.getElementById('miniChart');
+
+    new Chart(ctx, {
+        type: 'bar', // horizontal bar chart
+        data: {
+            labels: ['Income', 'Expense'],
+            datasets: [{
+                label: 'Amount (₹)',
+                data: [{{ income }}, {{ expense }}],
+                backgroundColor: ['#198754', '#dc3545'], // green and red
+                borderWidth: 1
+            }]
+        },
+        options: {
+            indexAxis: 'y', // horizontal
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                x: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+
+
+{% endblock %}

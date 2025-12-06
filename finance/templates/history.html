@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container mt-4">
+
+    <h2>Transaction History</h2>
+    <hr>
+
+    <!-- Filter Form -->
+    <form method="POST" class="row g-3 mb-4 p-3 bg-white rounded shadow-sm">
+
+        <div class="col-md-4">
+            <label class="form-label">Start Date</label>
+            <input type="date" name="start_date" class="form-control" value="{{ start_date }}">
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">End Date</label>
+            <input type="date" name="end_date" class="form-control" value="{{ end_date }}">
+        </div>
+
+        <div class="col-md-4 d-flex align-items-end">
+            <button class="btn btn-primary w-100" type="submit">Filter</button>
+        </div>
+
+        <div class="col-md-4 d-flex align-items-end">
+            <a href="{{ url_for('main.export_csv', start_date=start_date, end_date=end_date) }}"
+                class="btn btn-success w-100">
+                Download CSV
+            </a>
+        </div>
+
+    </form>
+
+    <!-- Transaction Table -->
+    <div class="table-responsive bg-white p-3 rounded shadow-sm">
+        <table class="table table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+
+            <tbody>
+            {% for t in transactions %}
+                <tr>
+                    <td>{{ t.date.strftime('%Y-%m-%d') }}</td>
+                    <td>
+                        {% if t.trans_type == 'income' %}
+                            <span class="text-success fw-bold">Income</span>
+                        {% else %}
+                            <span class="text-danger fw-bold">Expense</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ t.description }}</td>
+                    <td>
+                        {% if t.trans_type == 'income' %}
+                            <span class="text-success">₹ {{ t.amount }}</span>
+                        {% else %}
+                            <span class="text-danger">₹ {{ t.amount }}</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+
+        </table>
+    </div>
+
+</div>
+
+{% endblock %}

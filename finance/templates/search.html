@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container mt-4">
+
+    <h2>Search Transactions</h2>
+    <hr>
+
+    <!-- Search Form -->
+    <form method="POST" class="row g-3 mb-4 p-3 bg-white rounded shadow-sm">
+        <div class="col-md-10">
+            <input type="text" name="keyword" class="form-control" placeholder="Search by description, amount or date...">
+        </div>
+
+        <div class="col-md-2">
+            <button class="btn btn-primary w-100" type="submit">Search</button>
+        </div>
+    </form>
+
+    {% if results %}
+    <div class="table-responsive bg-white p-3 rounded shadow-sm">
+        <table class="table table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+
+            <tbody>
+            {% for t in results %}
+                <tr>
+                    <td>{{ t.date }}</td>
+                    <td>
+                        {% if t.trans_type == 'income' %}
+                            <span class="text-success fw-bold">Income</span>
+                        {% else %}
+                            <span class="text-danger fw-bold">Expense</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ t.description }}</td>
+                    <td>
+                        {% if t.trans_type == 'income' %}
+                            <span class="text-success">₹ {{ t.amount }}</span>
+                        {% else %}
+                            <span class="text-danger">₹ {{ t.amount }}</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+
+        </table>
+    </div>
+    {% endif %}
+
+</div>
+
+{% endblock %}

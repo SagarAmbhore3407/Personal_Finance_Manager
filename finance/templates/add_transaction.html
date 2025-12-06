@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Add Transaction</h2>
+    <hr>
+
+    <!-- Show current savings -->
+    <div class="alert alert-info">
+        Current Savings: <strong>₹{{ current_savings }}</strong>
+    </div>
+
+    <form method="POST" id="transForm">
+
+        <!-- Transaction Type -->
+        <div class="form-group mb-3">
+            <label for="trans_type">Transaction Type</label>
+            <select name="trans_type" id="trans_type" class="form-control" required>
+                <option value="">-- Select --</option>
+                <option value="income">Income</option>
+                <option value="expense">Expense</option>
+            </select>
+        </div>
+
+        <!-- Expense warning -->
+        <div id="expenseWarning" class="text-danger mb-2" style="display:none;">
+            Note: Expense cannot exceed your current savings.
+        </div>
+
+        <!-- Date -->
+        <div class="form-group mb-3">
+            <label for="date">Date</label>
+            <input type="date" name="date" class="form-control" required>
+        </div>
+
+        <!-- Description -->
+        <div class="form-group mb-3">
+            <label for="description">Description</label>
+            <input type="text" name="description" class="form-control" placeholder="Salary, groceries, rent..." required>
+        </div>
+
+        <!-- Amount -->
+        <div class="form-group mb-3">
+            <label for="amount">Amount</label>
+            <input type="number" step="0.01" id="amount" name="amount" class="form-control" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Add Transaction</button>
+    </form>
+</div>
+
+<script>
+// Show / hide expense warning
+document.getElementById("trans_type").addEventListener("change", function () {
+    const warning = document.getElementById("expenseWarning");
+    warning.style.display = (this.value === "expense") ? "block" : "none";
+});
+
+// Prevent submitting expense larger than savings on frontend (extra safety)
+document.getElementById("transForm").addEventListener("submit", function (e) {
+    const type = document.getElementById("trans_type").value;
+    const amount = parseFloat(document.getElementById("amount").value);
+    const savings = parseFloat("{{ current_savings }}");
+
+    if (type === "expense" && amount > savings) {
+        e.preventDefault();
+        alert("Insufficient Balance. Current Saving is ₹" + savings);
+    }
+});
+</script>
+{% endblock %}
